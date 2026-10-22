@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinic Management & Real-Time Patient Queue</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #0b0f19;
+            --bg-surface: #111827;
+            --bg-card: rgba(22, 30, 49, 0.75);
+            --bg-card-hover: rgba(30, 41, 67, 0.9);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-focus: #3b82f6;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --text-dim: #6b7280;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            min-height: 100vh;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* Top Navigation Header */
+        header {
+            background: rgba(17, 24, 39, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            padding: 0.85rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .brand-badge {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 12px var(--success);
+        }
+
+        .brand-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.15rem;
+            letter-spacing: -0.02em;
+            color: #ffffff;
+        }
+
+        .brand-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        .auth-bar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .role-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(59, 130, 246, 0.12);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            padding: 0.35rem 0.85rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .quick-switch {
+            display: flex;
+            gap: 0.4rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.25rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+
+        .quick-switch button {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.35rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-switch button.active {
+            background: var(--primary);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .swagger-link {
+            text-decoration: none;
+            color: #93c5fd;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.4rem 0.85rem;
+            border-radius: 8px;
+            border: 1px solid rgba(147, 197, 253, 0.25);
+            transition: all 0.2s;
+        }
+
+        .swagger-link:hover {
+            background: rgba(147, 197, 253, 0.1);
+            color: #ffffff;
+        }
+
+        /* Main Container & Tabs */
+        main {
+            max-width: 1380px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem 3rem;
+        }
+
+        .tab-nav {
+            display: flex;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1.75rem;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.75rem 1.25rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.2s;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+        }
+
+        .tab-btn.active {
+            color: #ffffff;
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Metric Cards */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .metric-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 800;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #ffffff;
+        }
+
+        .metric-desc {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        /* Layout Grids */
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 960px) {
+            .grid-2col {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .panel-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: #ffffff;
+        }
+
+        /* Ticket Cards */
+        .ticket-item {
+            background: rgba(17, 24, 39, 0.7);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.25rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s;
+        }
+
+        .ticket-item:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .ticket-item.serving {
+            border-color: rgba(16, 185, 129, 0.4);
+            background: rgba(16, 185, 129, 0.06);
+        }
+
+        .ticket-left {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .ticket-code {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            color: #60a5fa;
+            min-width: 80px;
+        }
+
+        .ticket-item.serving .ticket-code {
+            color: #34d399;
+        }
+
+        .ticket-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+
+        .ticket-patient {
+            font-weight: 600;
+            color: #ffffff;
+            font-size: 0.95rem;
+        }
+
+        .ticket-doctor {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .ticket-right {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.3rem;
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 0.25rem 0.65rem;
+            border-radius: 9999px;
+        }
+
+        .badge-waiting {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .badge-inprogress {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .badge-completed {
+            background: rgba(107, 114, 128, 0.15);
+            color: #9ca3af;
+            border: 1px solid rgba(107, 114, 128, 0.3);
+        }
+
+        .badge-conflict {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .wait-time {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+
+        /* Forms & Inputs */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            color: var(--text-muted);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            background: rgba(17, 24, 39, 0.8);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 0.65rem 0.85rem;
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary);
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 0.65rem 1.25rem;
+            border-radius: var(--radius-sm);
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-success {
+            background: #059669;
+        }
+
+        .btn-success:hover {
+            background: #047857;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        /* Result Alerts */
+        .alert-box {
+            margin-top: 1rem;
+            padding: 0.85rem 1.15rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            display: none;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #34d399;
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
+        }
+
+        pre.code-output {
+            background: #030712;
+            border: 1px solid var(--border);
+            padding: 0.85rem;
+            border-radius: var(--radius-sm);
+            font-family: monospace;
+            font-size: 0.78rem;
+            color: #cbd5e1;
+            max-height: 240px;
+            overflow-y: auto;
+            margin-top: 0.75rem;
+        }
+
+        .empty-placeholder {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="brand">
+            <div class="brand-badge" id="connIndicator"></div>
+            <div>
+                <div class="brand-title">Clinic Care Portal</div>
+                <div class="brand-sub">Backend API & Live Queue Engine</div>
+            </div>
+        </div>
+
+        <div class="auth-bar">
+            <span class="role-pill" id="currentRoleDisplay">ROLE_RECEPTIONIST</span>
+
+            <div class="quick-switch">
+                <button type="button" id="roleReceptionBtn" class="active" onclick="switchRole('reception', 'Reception@123', 'ROLE_RECEPTIONIST')">Receptionist</button>
+                <button type="button" id="roleDoctorBtn" onclick="switchRole('dr.smith', 'Doctor@123', 'ROLE_DOCTOR (Dr. Smith)')">Dr. Smith</button>
+                <button type="button" id="roleAdminBtn" onclick="switchRole('admin', 'Admin@123', 'ROLE_ADMIN')">Admin</button>
+            </div>
+
+            <a href="/swagger-ui.html" target="_blank" class="swagger-link">OpenAPI Docs</a>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main>
+        <!-- Tab Navigation -->
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="showTab('tab-queue')">Live Queue Display</button>
+            <button class="tab-btn" onclick="showTab('tab-doctor')">Doctor Consultation Desk</button>
+            <button class="tab-btn" onclick="showTab('tab-reception')">Reception & Check-In</button>
+            <button class="tab-btn" onclick="showTab('tab-conflicts')">Conflict Detection Lab</button>
+        </div>
+
+        <!-- Metric Summary Cards -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <span class="metric-label">Currently Serving</span>
+                <span class="metric-value" id="metricServing" style="color: #34d399;">--</span>
+                <span class="metric-desc">Patient currently in room</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-label">Waiting in Queue</span>
+                <span class="metric-value" id="metricWaiting" style="color: #fbbf24;">0</span>
+                <span class="metric-desc">Patients in waiting lounge</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-label">Completed Today</span>
+                <span class="metric-value" id="metricCompleted" style="color: #9ca3af;">0</span>
+                <span class="metric-desc">Finished consultations</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-label">Est. Wait Next</span>
+                <span class="metric-value" id="metricEstWait" style="color: #60a5fa;">0 min</span>
+                <span class="metric-desc">Based on 15m/patient</span>
+            </div>
+        </div>
+
+        <!-- TAB 1: LIVE QUEUE DISPLAY (TV / Waiting Room) -->
+        <div id="tab-queue" class="tab-panel active">
+            <div class="grid-2col">
+                <!-- Currently Serving -->
+                <div class="panel-box">
+                    <div class="panel-header">
+                        <span class="panel-title">Now In Consultation Room</span>
+                        <span class="badge badge-inprogress">In Progress</span>
+                    </div>
+                    <div id="servingContainer">
+                        <div class="empty-placeholder">No patient currently in consultation room</div>
+                    </div>
+                </div>
+
+                <!-- Waiting Line -->
+                <div class="panel-box">
+                    <div class="panel-header">
+                        <span class="panel-title">Next Up In Queue</span>
+                        <span class="badge badge-waiting" id="waitingCountBadge">0 Waiting</span>
+                    </div>
+                    <div id="waitingContainer">
+                        <div class="empty-placeholder">Waiting queue is currently empty</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: DOCTOR CONSULTATION DESK -->
+        <div id="tab-doctor" class="tab-panel">
+            <div class="grid-2col">
+                <div class="panel-box">
+                    <div class="panel-header">
+                        <span class="panel-title">Physician Station Controls</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Select Consulting Physician</label>
+                        <select id="doctorSelect" onchange="refreshDoctorQueue()">
+                            <option value="1">Dr. Sarah Smith (Cardiology - Room 101)</option>
+                            <option value="2">Dr. Robert Jones (General Medicine - Room 102)</option>
+                            <option value="3">Dr. Emily Chen (Pediatrics - Room 103)</option>
+                        </select>
+                    </div>
+
+                    <div style="display: flex; gap: 0.75rem; margin-top: 1.25rem;">
+                        <button type="button" class="btn btn-block" onclick="callNextPatient()">Call Next Patient</button>
+                    </div>
+
+                    <div id="doctorActionAlert" class="alert-box"></div>
+                </div>
+
+                <!-- Current In-Room Patient Details -->
+                <div class="panel-box">
+                    <div class="panel-header">
+                        <span class="panel-title">Current Patient Under Examination</span>
+                    </div>
+                    <div id="doctorCurrentPatient">
+                        <div class="empty-placeholder">Press "Call Next Patient" to admit the next ticket</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: RECEPTION & CHECK-IN -->
+        <div id="tab-reception" class="tab-panel">
+            <div class="grid-2col">
+                <!-- Queue Check-In Form -->
+                <div class="panel-box">
+                    <div class="panel-header">
+                        <span class="panel-title">Daily Queue Check-In</span>
+                        <span class="badge badge-waiting">Arrival Ticket</span>
+                    </div>
+
+                    <form id="checkInForm" onsubmit="handleCheckIn(event)">
+                        <div class="form-group">
+                            <label>Patient</label>
+                            <select id="checkInPatientId" required>
+                                <option value="1">PAT-2026-0001 - John Doe</option>
+                                <option value="2">PAT-2026-0002 - Jane Miller</option>
+                                <option value="3">PAT-2026-0003 - Alice Cooper</option>
+                                <option value="4">PAT-2026-0004 - David Wilson</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Doctor / Department</label>
+                            <select id="checkInDoctorId" required>
+                                <option value="1">Dr. Sarah Smith (Cardiology)</option>
+                                <option value="2">Dr. Robert Jones (General Medicine)</option>
+                                <option value="3">Dr. Emily Chen (Pediatrics)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Priority Level</label>
+                            <select id="checkInPriority">
+                                <option value="0">Normal (FIFO)</option>
+                                <option value="1">Urgent / Priority</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Visit Reason / Symptoms</label>
+                            <input type="text" id="checkInNotes" placeholder="e.g. Follow-up consultation or acute symptoms">
+                        </div>
+
+                        <button type="submit" class="btn btn-success btn-block">Generate Ticket & Check In</button>
+                    </form>
+
+                    <div id="checkInAlert" class="alert-box"></div>
+                </div>
+
+                <!-- Schedule Appointment Form -->
+                <div class="panel-box">
+                    <div class="panel-header">
+                        <span class="panel-title">Schedule New Appointment</span>
+                    </div>
+
+                    <form id="appointmentForm" onsubmit="handleScheduleAppointment(event)">
+                        <div class="form-group">
+                            <label>Patient</label>
+                            <select id="appPatientId" required>
+                                <option value="1">John Doe (PAT-2026-0001)</option>
+                                <option value="2">Jane Miller (PAT-2026-0002)</option>
+                                <option value="3">Alice Cooper (PAT-2026-0003)</option>
+                                <option value="4">David Wilson (PAT-2026-0004)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Doctor</label>
+                            <select id="appDoctorId" required>
+                                <option value="1">Dr. Sarah Smith (Cardiology)</option>
+                                <option value="2">Dr. Robert Jones (General Medicine)</option>
+                                <option value="3">Dr. Emily Chen (Pediatrics)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Date & Time</label>
+                            <input type="datetime-local" id="appDateTime" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Duration (Minutes)</label>
+                            <input type="number" id="appDuration" value="30" min="10" max="180">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Reason for Visit</label>
+                            <input type="text" id="appReason" placeholder="e.g. Annual physical exam" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-block">Book Appointment</button>
+                    </form>
+
+                    <div id="appAlert" class="alert-box"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: CONFLICT DETECTION LAB -->
+        <div id="tab-conflicts" class="tab-panel">
+            <div class="panel-box">
+                <div class="panel-header">
+                    <span class="panel-title">Double-Booking & Conflict Validation Engine</span>
+                    <span class="badge badge-conflict">Collision Test</span>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">
+                    Demonstrates how the backend SQL overlap queries prevent scheduling conflicts. Click "Trigger Overlapping Booking" to attempt booking Dr. Sarah Smith during an already reserved window.
+                </p>
+
+                <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.25rem;">
+                    <button type="button" class="btn btn-danger" onclick="triggerConflictDemo()">Trigger Overlapping Booking (409 Conflict)</button>
+                    <button type="button" class="btn btn-outline" onclick="triggerDuplicateQueueDemo()">Trigger Duplicate Check-In (400 Bad Request)</button>
+                </div>
+
+                <div id="conflictAlert" class="alert-box"></div>
+                <pre id="conflictRawOutput" class="code-output" style="display:none;"></pre>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // State
+        let currentToken = '';
+        let currentRole = 'ROLE_RECEPTIONIST';
+        const API_BASE = '/api/v1';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Set default appointment date-time to tomorrow 14:00
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(14, 0, 0, 0);
+            const isoLocal = new Date(tomorrow.getTime() - tomorrow.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+            document.getElementById('appDateTime').value = isoLocal;
+
+            // Login as receptionist by default
+            await switchRole('reception', 'Reception@123', 'ROLE_RECEPTIONIST');
+
+            // Initial load of queue
+            refreshQueueBoard();
+
+            // Auto-refresh queue display every 5 seconds
+            setInterval(refreshQueueBoard, 5000);
+        });
+
+        // Tab Switching
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+            const targetBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabId));
+            if (targetBtn) targetBtn.classList.add('active');
+
+            const targetPanel = document.getElementById(tabId);
+            if (targetPanel) targetPanel.classList.add('active');
+
+            if (tabId === 'tab-queue') refreshQueueBoard();
+            if (tabId === 'tab-doctor') refreshDoctorQueue();
+        }
+
+        // Role Authentication Switcher
+        async function switchRole(username, password, roleName) {
+            try {
+                const res = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await res.json();
+                if (data.success && data.data) {
+                    currentToken = data.data.token;
+                    currentRole = roleName;
+                    document.getElementById('currentRoleDisplay').innerText = roleName;
+
+                    // Update UI active button
+                    document.querySelectorAll('.quick-switch button').forEach(b => b.classList.remove('active'));
+                    if (username === 'reception') document.getElementById('roleReceptionBtn').classList.add('active');
+                    if (username === 'dr.smith') document.getElementById('roleDoctorBtn').classList.add('active');
+                    if (username === 'admin') document.getElementById('roleAdminBtn').classList.add('active');
+                }
+            } catch (err) {
+                console.error("Auth failed:", err);
+            }
+        }
+
+        // Fetch & Render Live Queue Board
+        async function refreshQueueBoard() {
+            try {
+                const res = await fetch(`${API_BASE}/queues/display`);
+                const json = await res.json();
+                if (!json.success || !json.data) return;
+
+                const q = json.data;
+
+                // Update Metrics
+                document.getElementById('metricWaiting').innerText = q.waitingCount || 0;
+                document.getElementById('metricCompleted').innerText = q.completedCount || 0;
+
+                const currentServing = q.currentlyServing && q.currentlyServing.length > 0 ? q.currentlyServing[0] : null;
+                document.getElementById('metricServing').innerText = currentServing ? currentServing.queueNumber : '--';
+
+                const nextWait = q.waitingList && q.waitingList.length > 0 ? q.waitingList[0].estimatedWaitMinutes : 0;
+                document.getElementById('metricEstWait').innerText = `${nextWait} min`;
+
+                // Render Serving
+                const servingContainer = document.getElementById('servingContainer');
+                if (q.currentlyServing && q.currentlyServing.length > 0) {
+                    servingContainer.innerHTML = q.currentlyServing.map(s => `
+                        <div class="ticket-item serving">
+                            <div class="ticket-left">
+                                <div class="ticket-code">${s.queueNumber}</div>
+                                <div class="ticket-meta">
+                                    <div class="ticket-patient">${s.patientName} (${s.patientIdentifier})</div>
+                                    <div class="ticket-doctor">${s.doctorName} &bull; ${s.consultationRoom}</div>
+                                </div>
+                            </div>
+                            <div class="ticket-right">
+                                <span class="badge badge-inprogress">In Room</span>
+                                <span class="wait-time">Called at ${s.calledTime ? s.calledTime.substring(11, 16) : ''}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    servingContainer.innerHTML = '<div class="empty-placeholder">No patient currently in consultation room</div>';
+                }
+
+                // Render Waiting
+                const waitingContainer = document.getElementById('waitingContainer');
+                document.getElementById('waitingCountBadge').innerText = `${q.waitingCount || 0} Waiting`;
+
+                if (q.waitingList && q.waitingList.length > 0) {
+                    waitingContainer.innerHTML = q.waitingList.map(w => `
+                        <div class="ticket-item">
+                            <div class="ticket-left">
+                                <div class="ticket-code">${w.queueNumber}</div>
+                                <div class="ticket-meta">
+                                    <div class="ticket-patient">${w.patientName} (${w.patientIdentifier})</div>
+                                    <div class="ticket-doctor">${w.doctorName} &bull; ${w.consultationRoom}</div>
+                                </div>
+                            </div>
+                            <div class="ticket-right">
+                                <span class="badge badge-waiting">Position #${w.positionInQueue}</span>
+                                <span class="wait-time">~${w.estimatedWaitMinutes} min wait</span>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    waitingContainer.innerHTML = '<div class="empty-placeholder">Waiting queue is currently empty</div>';
+                }
+
+            } catch (err) {
+                console.error("Failed to refresh queue:", err);
+            }
+        }
+
+        // Doctor Station - Call Next Patient
+        async function callNextPatient() {
+            const doctorId = document.getElementById('doctorSelect').value;
+            const alertBox = document.getElementById('doctorActionAlert');
+            alertBox.style.display = 'none';
+
+            // Ensure doctor token
+            await switchRole('dr.smith', 'Doctor@123', 'ROLE_DOCTOR');
+
+            try {
+                const res = await fetch(`${API_BASE}/queues/call-next?doctorId=${doctorId}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
+
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    alertBox.className = 'alert-box alert-success';
+                    alertBox.innerText = `Called ${data.data.queueNumber} (${data.data.patientName}) into ${data.data.consultationRoom}!`;
+                    alertBox.style.display = 'block';
+
+                    renderDoctorCurrentPatient(data.data);
+                    refreshQueueBoard();
+                } else {
+                    alertBox.className = 'alert-box alert-danger';
+                    alertBox.innerText = data.message || "Failed to call next patient";
+                    alertBox.style.display = 'block';
+                }
+            } catch (err) {
+                alertBox.className = 'alert-box alert-danger';
+                alertBox.innerText = err.message;
+                alertBox.style.display = 'block';
+            }
+        }
+
+        function renderDoctorCurrentPatient(ticket) {
+            const container = document.getElementById('doctorCurrentPatient');
+            if (!ticket) {
+                container.innerHTML = '<div class="empty-placeholder">Press "Call Next Patient" to admit the next ticket</div>';
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="ticket-item serving" style="flex-direction: column; align-items: stretch; gap: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="ticket-code" style="font-size: 1.75rem;">${ticket.queueNumber}</div>
+                        <span class="badge badge-inprogress">In Progress</span>
+                    </div>
+                    <div>
+                        <div style="font-weight: 700; font-size: 1.1rem; color: #fff;">${ticket.patientName}</div>
+                        <div style="color: var(--text-muted); font-size: 0.85rem;">Medical ID: ${ticket.patientIdentifier} | Phone: ${ticket.patientPhone || 'N/A'}</div>
+                        <div style="color: var(--text-dim); font-size: 0.8rem; margin-top: 0.35rem;">Notes: ${ticket.notes || 'None recorded'}</div>
+                    </div>
+                    <div style="display: flex; gap: 0.75rem;">
+                        <button type="button" class="btn btn-success btn-block" onclick="completeConsultation(${ticket.id})">Complete Consultation</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function completeConsultation(ticketId) {
+            const alertBox = document.getElementById('doctorActionAlert');
+            try {
+                const res = await fetch(`${API_BASE}/queues/${ticketId}/status`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentToken}`
+                    },
+                    body: JSON.stringify({ status: 'COMPLETED', notes: 'Consultation concluded successfully' })
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    alertBox.className = 'alert-box alert-success';
+                    alertBox.innerText = `Consultation for ticket completed.`;
+                    alertBox.style.display = 'block';
+                    renderDoctorCurrentPatient(null);
+                    refreshQueueBoard();
+                }
+            } catch (err) {
+                alertBox.className = 'alert-box alert-danger';
+                alertBox.innerText = err.message;
+                alertBox.style.display = 'block';
+            }
+        }
+
+        async function refreshDoctorQueue() {
+            const doctorId = document.getElementById('doctorSelect').value;
+            try {
+                const res = await fetch(`${API_BASE}/queues/display?doctorId=${doctorId}`);
+                const json = await res.json();
+                if (json.success && json.data && json.data.currentlyServing.length > 0) {
+                    renderDoctorCurrentPatient(json.data.currentlyServing[0]);
+                } else {
+                    renderDoctorCurrentPatient(null);
+                }
+            } catch (err) {}
+        }
+
+        // Reception - Handle Check-In
+        async function handleCheckIn(e) {
+            e.preventDefault();
+            const alertBox = document.getElementById('checkInAlert');
+            alertBox.style.display = 'none';
+
+            await switchRole('reception', 'Reception@123', 'ROLE_RECEPTIONIST');
+
+            const payload = {
+                patientId: Number(document.getElementById('checkInPatientId').value),
+                doctorId: Number(document.getElementById('checkInDoctorId').value),
+                priority: Number(document.getElementById('checkInPriority').value),
+                notes: document.getElementById('checkInNotes').value
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/queues/check-in`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentToken}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    alertBox.className = 'alert-box alert-success';
+                    alertBox.innerText = `Checked in! Assigned Ticket: ${data.data.queueNumber} (Position: #${data.data.positionInQueue}, Est. Wait: ${data.data.estimatedWaitMinutes} min)`;
+                    alertBox.style.display = 'block';
+                    document.getElementById('checkInNotes').value = '';
+                    refreshQueueBoard();
+                } else {
+                    alertBox.className = 'alert-box alert-danger';
+                    alertBox.innerText = data.message || "Check-in failed";
+                    alertBox.style.display = 'block';
+                }
+            } catch (err) {
+                alertBox.className = 'alert-box alert-danger';
+                alertBox.innerText = err.message;
+                alertBox.style.display = 'block';
+            }
+        }
+
+        // Reception - Schedule Appointment
+        async function handleScheduleAppointment(e) {
+            e.preventDefault();
+            const alertBox = document.getElementById('appAlert');
+            alertBox.style.display = 'none';
+
+            await switchRole('reception', 'Reception@123', 'ROLE_RECEPTIONIST');
+
+            const rawDate = document.getElementById('appDateTime').value;
+            const payload = {
+                patientId: Number(document.getElementById('appPatientId').value),
+                doctorId: Number(document.getElementById('appDoctorId').value),
+                appointmentDateTime: rawDate,
+                durationMinutes: Number(document.getElementById('appDuration').value),
+                reason: document.getElementById('appReason').value
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/appointments`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentToken}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    alertBox.className = 'alert-box alert-success';
+                    alertBox.innerText = `Appointment confirmed with ${data.data.doctorName} for ${data.data.appointmentDateTime.replace('T', ' ')}!`;
+                    alertBox.style.display = 'block';
+                } else {
+                    alertBox.className = 'alert-box alert-danger';
+                    alertBox.innerText = data.message || "Failed to schedule appointment";
+                    alertBox.style.display = 'block';
+                }
+            } catch (err) {
+                alertBox.className = 'alert-box alert-danger';
+                alertBox.innerText = err.message;
+                alertBox.style.display = 'block';
+            }
+        }
+
+        // Conflict Testing Lab
+        async function triggerConflictDemo() {
+            const alertBox = document.getElementById('conflictAlert');
+            const rawOutput = document.getElementById('conflictRawOutput');
+            alertBox.style.display = 'none';
+            rawOutput.style.display = 'none';
+
+            await switchRole('reception', 'Reception@123', 'ROLE_RECEPTIONIST');
+
+            // Find tomorrow at 10:15 (collides with seeded appointment for Dr. Smith at 10:00 - 10:30)
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const isoDate = tomorrow.toISOString().split('T')[0];
+
+            const conflictPayload = {
+                patientId: 2,
+                doctorId: 1, // Dr. Sarah Smith
+                appointmentDateTime: `${isoDate}T10:15:00`,
+                durationMinutes: 30,
+                reason: "Conflict collision test demonstration"
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/appointments`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentToken}`
+                    },
+                    body: JSON.stringify(conflictPayload)
+                });
+
+                const data = await res.json();
+                rawOutput.innerText = JSON.stringify(data, null, 2);
+                rawOutput.style.display = 'block';
+
+                if (res.status === 409) {
+                    alertBox.className = 'alert-box alert-danger';
+                    alertBox.innerText = `HTTP 409 Conflict Detected!\n${data.message}`;
+                    alertBox.style.display = 'block';
+                } else {
+                    alertBox.className = 'alert-box alert-success';
+                    alertBox.innerText = `Booked successfully (no conflict detected for this slot).`;
+                    alertBox.style.display = 'block';
+                }
+            } catch (err) {
+                alertBox.className = 'alert-box alert-danger';
+                alertBox.innerText = err.message;
+                alertBox.style.display = 'block';
+            }
+        }
+
+        async function triggerDuplicateQueueDemo() {
+            const alertBox = document.getElementById('conflictAlert');
+            const rawOutput = document.getElementById('conflictRawOutput');
+            alertBox.style.display = 'none';
+            rawOutput.style.display = 'none';
+
+            await switchRole('reception', 'Reception@123', 'ROLE_RECEPTIONIST');
+
+            // Patient 1 (John Doe) is already in queue from seed
+            const payload = {
+                patientId: 1,
+                doctorId: 1,
+                priority: 0,
+                notes: "Duplicate attempt demo"
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/queues/check-in`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentToken}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                rawOutput.innerText = JSON.stringify(data, null, 2);
+                rawOutput.style.display = 'block';
+
+                if (!res.ok) {
+                    alertBox.className = 'alert-box alert-danger';
+                    alertBox.innerText = `HTTP 400 Bad Request Detected!\n${data.message}`;
+                    alertBox.style.display = 'block';
+                }
+            } catch (err) {
+                alertBox.className = 'alert-box alert-danger';
+                alertBox.innerText = err.message;
+                alertBox.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

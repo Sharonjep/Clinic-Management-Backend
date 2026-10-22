@@ -89,7 +89,8 @@ public class SecurityConfig {
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Public Endpoints
+                        // Public Endpoints & Static UI
+                        .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/favicon.ico", "/assets/**").permitAll()
                         .requestMatchers("/api/v1/auth/login").permitAll()
                         .requestMatchers("/api/v1/queues/display").permitAll()
                         .requestMatchers(

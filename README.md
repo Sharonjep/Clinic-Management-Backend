@@ -1,4 +1,4 @@
-# 🏥 Clinic Management & Real-Time Patient Queue Backend API
+# Clinic Management & Real-Time Patient Queue Backend API
 
 [![Java 21](https://img.shields.io/badge/Java-21%20LTS-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/21/)
 [![Spring Boot 3.3.5](https://img.shields.io/badge/Spring%20Boot-3.3.5-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
@@ -10,7 +10,7 @@
 
 ---
 
-## 📌 Executive Summary
+##  Executive Summary
 
 ### The Problem
 Small medical clinics and outpatient practices often manage appointments and daily patient queues manually or using fragmented spreadsheets. This leads to:
@@ -29,7 +29,7 @@ A backend RESTful API built on **Java 21**, **Spring Boot 3**, **Spring Security
 
 ---
 
-## 🏗️ Architecture & Design Patterns
+## Architecture & Design Patterns
 
 The application follows clean, layered architecture principles:
 
@@ -64,7 +64,7 @@ The application follows clean, layered architecture principles:
 
 ---
 
-## 📊 Entity Relationship Diagram (ERD)
+##  Entity Relationship Diagram (ERD)
 
 ```mermaid
 erDiagram
@@ -144,7 +144,7 @@ erDiagram
 
 ---
 
-## 🔄 Patient Queue & Appointment Lifecycle
+##  Patient Queue & Appointment Lifecycle
 
 ```mermaid
 stateDiagram-v2
@@ -163,7 +163,7 @@ stateDiagram-v2
 
 ---
 
-## 🛠️ Technology Stack
+##  Technology Stack
 
 | Technology | Version | Purpose in this Project |
 | :--- | :--- | :--- |
@@ -181,7 +181,7 @@ stateDiagram-v2
 
 ---
 
-## 🔐 Role-Based Access Control (RBAC) Matrix
+##  Role-Based Access Control (RBAC) Matrix
 
 | Endpoint | Method | Public | ROLE_RECEPTIONIST | ROLE_DOCTOR | ROLE_ADMIN |
 | :--- | :---: | :---: | :---: | :---: | :---: |
@@ -200,7 +200,7 @@ stateDiagram-v2
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Pre-Seeded Demonstration Accounts
 When launched with initial seeding enabled, the system automatically provisions fictional staff accounts and clinic records:
@@ -474,7 +474,7 @@ curl http://localhost:8085/api/v1/queues/display
 
 ---
 
-## 🧪 Automated Testing
+##  Automated Testing
 
 The project includes unit and integration tests:
 - **`AppointmentServiceTest`**: Validates conflict detection logic, overlapping boundary conditions, rescheduling rules, and invalid cancellation states.
@@ -508,7 +508,7 @@ The project includes unit and integration tests:
 
 ---
 
-## 💡 Interview Discussion Points
+##  Interview Discussion Points
 
 When discussing this codebase in technical interviews, highlight these engineering decisions:
 
@@ -526,5 +526,5 @@ When discussing this codebase in technical interviews, highlight these engineeri
 
 ---
 
-## 📄 License
+##  License
 This project is open-source under the [Apache 2.0 License](LICENSE).

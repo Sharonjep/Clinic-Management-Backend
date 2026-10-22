@@ -1,0 +1,49 @@
+server:
+  port: ${PORT:8085}
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: clinic-management
+
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:clinic_db}}
+    username: ${SPRING_DATASOURCE_USERNAME:${DB_USER:clinic_user}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD:clinic_pass}}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+
+clinic:
+  security:
+    jwt:
+      secret: "c2VjdXJlQ2xpbmljTWFuYWdlbWVudFN5c3RlbUp3dFNlY3JldEtleTIwMjZNaW5pbXVtMjU2Qml0cw=="
+      expiration-ms: 86400000 # 24 hours
+  initial-seed: true
+
+# OpenAPI / Swagger
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: method
+  show-actuator: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

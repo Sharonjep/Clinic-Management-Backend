@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:clinic_test_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL
+    driverClassName: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+  h2:
+    console:
+      enabled: false
+
+clinic:
+  security:
+    jwt:
+      secret: "dGVzdFNlY3JldEtleUZvckNsaW5pY01hbmFnZW1lbnRVbml0VGVzdHMyMDI2TWluaW11bTI1NkJpdHM="
+      expiration-ms: 3600000
+  initial-seed: false
